@@ -1,0 +1,1 @@
+--with-dbus-sys=/usr/share/dbus-1/system.d --enable-swupd --with-dbus-services=/usr/share/dbus-1/system-services

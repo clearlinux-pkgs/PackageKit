@@ -1,0 +1,7 @@
+appstream
+libalpm
+libzypp
+nix-expr
+nix-main
+nix-store
+libdnf

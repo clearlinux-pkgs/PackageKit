@@ -1,0 +1,166 @@
+commit 77bea445151788bc21a6f2111ad754d3bb429637
+Author: Arjan van de Ven <arjan@linux.intel.com>
+Date:   Sat Nov 10 22:47:47 2018 +0000
+
+    Initial swupd support
+
+diff --git a/backends/Makefile.am b/backends/Makefile.am
+index 462a43aeb..64331df1d 100644
+--- a/backends/Makefile.am
++++ b/backends/Makefile.am
+@@ -56,6 +56,10 @@ if BACKEND_TYPE_NIX
+ SUBDIRS += nix
+ endif
+ 
++if BACKEND_TYPE_SWUPD
++SUBDIRS += swupd
++endif
++
+ clean-local :
+ 	rm -f *~
+ 
+diff --git a/backends/swupd/Makefile.am b/backends/swupd/Makefile.am
+new file mode 100644
+index 000000000..ba7d666c6
+--- /dev/null
++++ b/backends/swupd/Makefile.am
+@@ -0,0 +1,11 @@
++plugindir = $(PK_PLUGIN_DIR)
++plugin_LTLIBRARIES = libpk_backend_swupd.la
++
++libpk_backend_swupd_la_SOURCES = \
++  pk-backend-swupd.c
++libpk_backend_swupd_la_LIBADD = $(PK_PLUGIN_LIBS)
++libpk_backend_swupd_la_LDFLAGS = -module -avoid-version
++libpk_backend_swupd_la_CFLAGS = $(PK_PLUGIN_CFLAGS) $(AM_CPPFLAGS)
++libpk_backend_swupd_la_CPPFLAGS = $(PK_PLUGIN_CFLAGS) $(SWUPD_CFLAGS) $(AM_CPPFLAGS)
++
++-include $(top_srcdir)/git.mk
+diff --git a/backends/swupd/pk-backend-swupd.c b/backends/swupd/pk-backend-swupd.c
+new file mode 100644
+index 000000000..fbe3f7254
+--- /dev/null
++++ b/backends/swupd/pk-backend-swupd.c
+@@ -0,0 +1,77 @@
++/* -*- Mode: C; tab-width: 8; indent-tab-modes: t; c-basic-offset: 8 -*-
++ *
++ * Copyright (C) 2018 Intel Corporation
++ * Author: Arjan van de Ven <arjan@linux.intel.com>
++ *
++ * Licensed under the GNU General Public License Version 2
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed i3n the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.        See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++ */
++
++#include <string.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <gio/gio.h>
++
++#include <pk-backend.h>
++#include <pk-backend-job.h>
++
++void
++pk_backend_initialize (GKeyFile* conf, PkBackend* backend)
++{
++}
++
++void
++pk_backend_destroy (PkBackend* backend)
++{
++}
++
++gboolean
++pk_backend_supports_parallelization (PkBackend* backend)
++{
++       return FALSE;
++}
++
++const gchar *
++pk_backend_get_description (PkBackend* backend)
++{
++       return "swupd - Clear Linux OS component installer";
++}
++
++const gchar *
++pk_backend_get_author (PkBackend* backend)
++{
++       return "Arjan van de Ven <arjan@linux.intel.com>";
++}
++
++void
++pk_backend_refresh_cache (PkBackend* backend, PkBackendJob* job, gboolean force)
++{
++	/* No cache to refresh */
++	 pk_backend_job_finished (job);
++}
++
++void
++pk_backend_search_files (PkBackend *backend, PkBackendJob *job, PkBitfield filters, gchar **values)
++{
++	gchar *filters_text;
++	gchar *search;
++	filters_text = pk_filter_bitfield_to_string (filters);
++	search = g_strjoinv ("&", values);
++	fprintf(stderr, "ft = %s    search = %s \n", filters_text, search);
++//	pk_backend_spawn_helper (priv->spawn, job, "yumBackend.py", "search-file", filters_text, search, NULL);
++	g_free (filters_text);
++	g_free (search);
++}
+diff --git a/configure.ac b/configure.ac
+index 1a377fd3d..d727b6ec8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -354,6 +354,7 @@ AC_ARG_ENABLE(urpmi, AS_HELP_STRING([--enable-urpmi],[use the URPMI backend]),en
+ AC_ARG_ENABLE(yum, AS_HELP_STRING([--enable-yum],[use the YUM backend]),enable_yum=$enableval,enable_yum=no)
+ AC_ARG_ENABLE(zypp, AS_HELP_STRING([--enable-zypp],[use the Zypp backend]),enable_zypp=$enableval,enable_zypp=no)
+ AC_ARG_ENABLE(nix, AS_HELP_STRING([--enable-nix],[use the Nix backend]),enable_nix=$enableval,enable_nix=no)
++AC_ARG_ENABLE(swupd, AS_HELP_STRING([--enable-swupd],[use the Clear Linux swupd backend]),enable_swupd=$enableval,enable_swupd=no)
+ 
+ # export to Makefile.am's
+ AM_CONDITIONAL(BACKEND_TYPE_ALPM, [test x$enable_alpm = xyes])
+@@ -370,6 +371,7 @@ AM_CONDITIONAL(BACKEND_TYPE_URPMI, [test x$enable_urpmi = xyes])
+ AM_CONDITIONAL(BACKEND_TYPE_YUM, [test x$enable_yum = xyes])
+ AM_CONDITIONAL(BACKEND_TYPE_ZYPP, [test x$enable_zypp = xyes])
+ AM_CONDITIONAL(BACKEND_TYPE_NIX, [test x$enable_nix = xyes])
++AM_CONDITIONAL(BACKEND_TYPE_SWUPD, [test x$enable_swupd = xyes])
+ 
+ dnl ---------------------------------------------------------------------------
+ dnl - Are we specifying a different dbus root ?
+@@ -513,6 +515,10 @@ if test x$enable_nix = xyes; then
+ 	PKG_CHECK_MODULES(NIX, nix-store >= 1.12)
+ fi
+ 
++if test x$enable_swupd = xyes; then
++	PKG_CHECK_MODULES(CURL, libcurl)
++fi
++
+ AC_SUBST(PK_PLUGIN_DIR, "\$(libdir)/packagekit-backend")
+ AC_SUBST(PK_PLUGIN_CFLAGS, "-I\$(top_srcdir)/src -I\$(top_srcdir)/lib -DPK_COMPILATION $GLIB_CFLAGS $GMODULE_CFLAGS $GIO_CFLAGS")
+ AC_SUBST(PK_PLUGIN_LIBS, "$GLIB_LIBS $GMODULE_LIBS $GIO_LIBS")
+@@ -556,6 +562,7 @@ backends/ports/Makefile
+ backends/ports/ruby_packagekit/Makefile
+ backends/zypp/Makefile
+ backends/nix/Makefile
++backends/swupd/Makefile
+ data/Makefile
+ data/org.freedesktop.PackageKit.conf
+ data/tests/Makefile
+@@ -618,4 +625,5 @@ echo "
+         YUM backend:               ${enable_yum}
+         Zypp backend:              ${enable_zypp}
+         Nix backend:               ${enable_nix}
++        swupd backend:             ${enable_swupd}
+ "
