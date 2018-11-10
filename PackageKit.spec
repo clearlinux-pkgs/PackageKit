@@ -6,7 +6,7 @@
 #
 Name     : PackageKit
 Version  : 1.1.11
-Release  : 1
+Release  : 2
 URL      : https://www.freedesktop.org/software/PackageKit/releases/PackageKit-1.1.11.tar.xz
 Source0  : https://www.freedesktop.org/software/PackageKit/releases/PackageKit-1.1.11.tar.xz
 Source99 : https://www.freedesktop.org/software/PackageKit/releases/PackageKit-1.1.11.tar.xz.asc
@@ -178,8 +178,8 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1541891944
-%reconfigure --disable-static --with-dbus-sys=/usr/share/dbus-1/system.d --enable-swupd --with-dbus-services=/usr/share/dbus-1/system-services
+export SOURCE_DATE_EPOCH=1541892987
+%reconfigure --disable-static --with-dbus-sys=/usr/share/dbus-1/system.d --enable-swupd --with-dbus-services=/usr/share/dbus-1/system-services --sysconfdir=/usr/share/PakcageKit/
 make  %{?_smp_mflags}
 
 %check
@@ -190,7 +190,7 @@ export no_proxy=localhost,127.0.0.1,0.0.0.0
 make VERBOSE=1 V=1 %{?_smp_mflags} check || :
 
 %install
-export SOURCE_DATE_EPOCH=1541891944
+export SOURCE_DATE_EPOCH=1541892987
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/PackageKit
 cp COPYING %{buildroot}/usr/share/package-licenses/PackageKit/COPYING
@@ -217,6 +217,12 @@ cp lib/packagekit-glib2/COPYING %{buildroot}/usr/share/package-licenses/PackageK
 /usr/lib64/girepository-1.0/PackageKitGlib-1.0.typelib
 /usr/share/PackageKit/helpers/test_spawn/search-name.sh
 /usr/share/PackageKit/pk-upgrade-distro.sh
+/usr/share/PakcageKit/PackageKit/CommandNotFound.conf
+/usr/share/PakcageKit/PackageKit/PackageKit.conf
+/usr/share/PakcageKit/PackageKit/Vendor.conf
+/usr/share/PakcageKit/cron.daily/packagekit-background.cron
+/usr/share/PakcageKit/profile.d/PackageKit.sh
+/usr/share/PakcageKit/sysconfig/packagekit-background
 /usr/share/bash-completion/completions/pkcon
 /usr/share/dbus-1/interfaces/org.freedesktop.PackageKit.Transaction.xml
 /usr/share/dbus-1/interfaces/org.freedesktop.PackageKit.xml
