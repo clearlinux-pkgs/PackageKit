@@ -6,11 +6,11 @@
 #
 Name     : PackageKit
 Version  : 1.1.12
-Release  : 4
+Release  : 5
 URL      : https://www.freedesktop.org/software/PackageKit/releases/PackageKit-1.1.12.tar.xz
 Source0  : https://www.freedesktop.org/software/PackageKit/releases/PackageKit-1.1.12.tar.xz
 Source99 : https://www.freedesktop.org/software/PackageKit/releases/PackageKit-1.1.12.tar.xz.asc
-Summary  : PackageKit is a system daemon for installing stuff.
+Summary  : A system designed to make installation and updates of packages easier
 Group    : Development/Tools
 License  : GPL-2.0 LGPL-2.1
 Requires: PackageKit-autostart = %{version}-%{release}
@@ -76,7 +76,6 @@ Group: Binaries
 Requires: PackageKit-data = %{version}-%{release}
 Requires: PackageKit-libexec = %{version}-%{release}
 Requires: PackageKit-license = %{version}-%{release}
-Requires: PackageKit-man = %{version}-%{release}
 Requires: PackageKit-services = %{version}-%{release}
 
 %description bin
@@ -98,6 +97,7 @@ Requires: PackageKit-lib = %{version}-%{release}
 Requires: PackageKit-bin = %{version}-%{release}
 Requires: PackageKit-data = %{version}-%{release}
 Provides: PackageKit-devel = %{version}-%{release}
+Requires: PackageKit = %{version}-%{release}
 
 %description dev
 dev components for the PackageKit package.
@@ -172,7 +172,14 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1544715876
+export SOURCE_DATE_EPOCH=1557096797
+export AR=gcc-ar
+export RANLIB=gcc-ranlib
+export NM=gcc-nm
+export CFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export FCFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export FFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=4 "
 %configure --disable-static --with-dbus-sys=/usr/share/dbus-1/system.d --enable-swupd --with-dbus-services=/usr/share/dbus-1/system-services --sysconfdir=/usr/share/PakcageKit/
 make  %{?_smp_mflags}
 
@@ -184,7 +191,7 @@ export no_proxy=localhost,127.0.0.1,0.0.0.0
 make VERBOSE=1 V=1 %{?_smp_mflags} check || :
 
 %install
-export SOURCE_DATE_EPOCH=1544715876
+export SOURCE_DATE_EPOCH=1557096797
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/PackageKit
 cp COPYING %{buildroot}/usr/share/package-licenses/PackageKit/COPYING
