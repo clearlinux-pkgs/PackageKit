@@ -6,10 +6,10 @@
 #
 Name     : PackageKit
 Version  : 1.1.12
-Release  : 5
+Release  : 6
 URL      : https://www.freedesktop.org/software/PackageKit/releases/PackageKit-1.1.12.tar.xz
 Source0  : https://www.freedesktop.org/software/PackageKit/releases/PackageKit-1.1.12.tar.xz
-Source99 : https://www.freedesktop.org/software/PackageKit/releases/PackageKit-1.1.12.tar.xz.asc
+Source1 : https://www.freedesktop.org/software/PackageKit/releases/PackageKit-1.1.12.tar.xz.asc
 Summary  : A system designed to make installation and updates of packages easier
 Group    : Development/Tools
 License  : GPL-2.0 LGPL-2.1
@@ -54,6 +54,7 @@ BuildRequires : pkgconfig(pangoft2)
 BuildRequires : pkgconfig(polkit-gobject-1)
 BuildRequires : pkgconfig(rpm)
 BuildRequires : pkgconfig(sqlite3)
+BuildRequires : util-linux
 BuildRequires : vala
 
 %description
@@ -97,6 +98,7 @@ Requires: PackageKit-lib = %{version}-%{release}
 Requires: PackageKit-bin = %{version}-%{release}
 Requires: PackageKit-data = %{version}-%{release}
 Provides: PackageKit-devel = %{version}-%{release}
+Requires: PackageKit = %{version}-%{release}
 Requires: PackageKit = %{version}-%{release}
 
 %description dev
@@ -171,8 +173,10 @@ services components for the PackageKit package.
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1557096797
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1572965234
+# -Werror is for werrorists
+export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
@@ -180,28 +184,29 @@ export CFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
 export FCFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
 export FFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
 export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=4 "
-%configure --disable-static --with-dbus-sys=/usr/share/dbus-1/system.d --enable-swupd --with-dbus-services=/usr/share/dbus-1/system-services --sysconfdir=/usr/share/PakcageKit/
+%configure --disable-static --with-dbus-sys=/usr/share/dbus-1/system.d --enable-swupd --with-dbus-services=/usr/share/dbus-1/system-services --sysconfdir=/usr/share/PackageKit/
 make  %{?_smp_mflags}
 
 %check
-export LANG=C
+export LANG=C.UTF-8
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 make VERBOSE=1 V=1 %{?_smp_mflags} check || :
 
 %install
-export SOURCE_DATE_EPOCH=1557096797
+export SOURCE_DATE_EPOCH=1572965234
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/PackageKit
-cp COPYING %{buildroot}/usr/share/package-licenses/PackageKit/COPYING
-cp lib/packagekit-glib2/COPYING %{buildroot}/usr/share/package-licenses/PackageKit/lib_packagekit-glib2_COPYING
+cp %{_builddir}/PackageKit-1.1.12/COPYING %{buildroot}/usr/share/package-licenses/PackageKit/4cc77b90af91e615a64ae04893fdffa7939db84c
+cp %{_builddir}/PackageKit-1.1.12/lib/packagekit-glib2/COPYING %{buildroot}/usr/share/package-licenses/PackageKit/01a6b4bf79aca9b556822601186afab86e8c4fbf
 %make_install
 %find_lang PackageKit
+## Remove excluded files
+rm -f %{buildroot}/var/lib/PackageKit/transactions.db
 
 %files
 %defattr(-,root,root,-)
-%exclude /var/lib/PackageKit/transactions.db
 /usr/lib64/gnome-settings-daemon-3.0/gtk-modules/pk-gtk-module.desktop
 
 %files autostart
@@ -216,14 +221,14 @@ cp lib/packagekit-glib2/COPYING %{buildroot}/usr/share/package-licenses/PackageK
 %files data
 %defattr(-,root,root,-)
 /usr/lib64/girepository-1.0/PackageKitGlib-1.0.typelib
+/usr/share/PackageKit/PackageKit/CommandNotFound.conf
+/usr/share/PackageKit/PackageKit/PackageKit.conf
+/usr/share/PackageKit/PackageKit/Vendor.conf
+/usr/share/PackageKit/cron.daily/packagekit-background.cron
 /usr/share/PackageKit/helpers/test_spawn/search-name.sh
 /usr/share/PackageKit/pk-upgrade-distro.sh
-/usr/share/PakcageKit/PackageKit/CommandNotFound.conf
-/usr/share/PakcageKit/PackageKit/PackageKit.conf
-/usr/share/PakcageKit/PackageKit/Vendor.conf
-/usr/share/PakcageKit/cron.daily/packagekit-background.cron
-/usr/share/PakcageKit/profile.d/PackageKit.sh
-/usr/share/PakcageKit/sysconfig/packagekit-background
+/usr/share/PackageKit/profile.d/PackageKit.sh
+/usr/share/PackageKit/sysconfig/packagekit-background
 /usr/share/bash-completion/completions/pkcon
 /usr/share/dbus-1/interfaces/org.freedesktop.PackageKit.Transaction.xml
 /usr/share/dbus-1/interfaces/org.freedesktop.PackageKit.xml
@@ -402,8 +407,8 @@ cp lib/packagekit-glib2/COPYING %{buildroot}/usr/share/package-licenses/PackageK
 
 %files license
 %defattr(0644,root,root,0755)
-/usr/share/package-licenses/PackageKit/COPYING
-/usr/share/package-licenses/PackageKit/lib_packagekit-glib2_COPYING
+/usr/share/package-licenses/PackageKit/01a6b4bf79aca9b556822601186afab86e8c4fbf
+/usr/share/package-licenses/PackageKit/4cc77b90af91e615a64ae04893fdffa7939db84c
 
 %files man
 %defattr(0644,root,root,0755)
