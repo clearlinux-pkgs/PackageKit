@@ -19,6 +19,7 @@ libpackagekit-glib2.so.18:pk_client_accept_eula
 libpackagekit-glib2.so.18:pk_client_accept_eula_async
 libpackagekit-glib2.so.18:pk_client_adopt
 libpackagekit-glib2.so.18:pk_client_adopt_async
+libpackagekit-glib2.so.18:pk_client_create_helper_argv_envp
 libpackagekit-glib2.so.18:pk_client_depends_on
 libpackagekit-glib2.so.18:pk_client_depends_on_async
 libpackagekit-glib2.so.18:pk_client_download_packages
@@ -58,8 +59,10 @@ libpackagekit-glib2.so.18:pk_client_get_update_detail_async
 libpackagekit-glib2.so.18:pk_client_get_updates
 libpackagekit-glib2.so.18:pk_client_get_updates_async
 libpackagekit-glib2.so.18:pk_client_helper_get_type
+libpackagekit-glib2.so.18:pk_client_helper_is_active
 libpackagekit-glib2.so.18:pk_client_helper_new
 libpackagekit-glib2.so.18:pk_client_helper_start
+libpackagekit-glib2.so.18:pk_client_helper_start_with_socket
 libpackagekit-glib2.so.18:pk_client_helper_stop
 libpackagekit-glib2.so.18:pk_client_install_files
 libpackagekit-glib2.so.18:pk_client_install_files_async

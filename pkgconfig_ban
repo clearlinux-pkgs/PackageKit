@@ -1,7 +1,9 @@
 appstream
 libalpm
+libdnf
+libelogind
 libzypp
 nix-expr
 nix-main
 nix-store
-libdnf
+ply-boot-client
