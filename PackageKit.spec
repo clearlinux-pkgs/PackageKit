@@ -6,7 +6,7 @@
 #
 Name     : PackageKit
 Version  : 1.1.13
-Release  : 7
+Release  : 8
 URL      : https://www.freedesktop.org/software/PackageKit/releases/PackageKit-1.1.13.tar.xz
 Source0  : https://www.freedesktop.org/software/PackageKit/releases/PackageKit-1.1.13.tar.xz
 Source1  : https://www.freedesktop.org/software/PackageKit/releases/PackageKit-1.1.13.tar.xz.asc
